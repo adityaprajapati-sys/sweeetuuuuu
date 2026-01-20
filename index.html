@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💖 Just For You</title>
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+
+html,body{
+    width:100%;
+    height:100%;
+    background:#ffd6e8;
+    font-family:system-ui,-apple-system,sans-serif;
+}
+
+/* Screens */
+.screen{
+    display:none;
+    width:100%;
+    height:100%;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    gap:20px;
+}
+
+.screen.active{
+    display:flex;
+}
+
+/* Buttons */
+button{
+    padding:14px 36px;
+    font-size:1.1rem;
+    border:none;
+    border-radius:30px;
+    background:#7a3cff;
+    color:white;
+    cursor:pointer;
+}
+
+/* Heart */
+.heart{
+    position:fixed;
+    top:10%;
+    font-size:4rem;
+    animation:float 2s ease-in-out infinite;
+}
+
+@keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-20px)}
+}
+
+.note{
+    font-size:1.4rem;
+    color:#b00040;
+}
+
+.no-msg{
+    min-height:1.5em;
+    font-size:1.2rem;
+    color:#b00040;
+}
+
+/* Image screen */
+#image-screen{
+    background:#000;
+    color:white;
+}
+
+#secure-image{
+    max-width:95vw;
+    max-height:95vh;
+    pointer-events:none;
+    user-select:none;
+}
+
+#timer{
+    position:fixed;
+    top:20px;
+    font-size:3rem;
+    color:#ff4d4d;
+}
+</style>
+</head>
+
+<body>
+
+<div class="heart">❤️</div>
+
+<!-- SCREEN 1 -->
+<div id="screen1" class="screen active">
+    <div class="note">Hi sweeetuuuu ❤️</div>
+    <h1>Do you want to continue?</h1>
+    <div id="msg1" class="no-msg"></div>
+    <button onclick="go(2)">Yes</button>
+    <button onclick="noClick(1)">No</button>
+</div>
+
+<!-- SCREEN 2 -->
+<div id="screen2" class="screen">
+    <h1>Really?</h1>
+    <div id="msg2" class="no-msg"></div>
+    <button onclick="go(3)">Yes</button>
+    <button onclick="noClick(2)">No</button>
+</div>
+
+<!-- IMAGE SCREEN -->
+<div id="image-screen" class="screen">
+    <div id="timer">3</div>
+    <img id="secure-image"
+         src="https://img.sanishtech.com/u/0954f6dc6cf1dbf283bf86eadc4d6dde.jpg">
+</div>
+
+<script>
+/* ===== RUN ONLY ONCE PER TAB (GitHub safe) ===== */
+document.addEventListener('DOMContentLoaded', () => {
+    if (sessionStorage.getItem('viewed_once') === 'yes') {
+        document.body.innerHTML = `
+            <div style="
+                width:100vw;
+                height:100vh;
+                background:#000;
+                color:#ff4d4d;
+                display:flex;
+                justify-content:center;
+                align-items:center;
+                text-align:center;
+                font-family:system-ui;
+            ">
+                <div>
+                    <h1>🔒 Session Expired</h1>
+                    <p style="opacity:0.8">
+                        Please close this tab and reopen the link ❤️
+                    </p>
+                </div>
+            </div>
+        `;
+    } else {
+        sessionStorage.setItem('viewed_once','yes');
+    }
+});
+
+/* ================= APP LOGIC ================= */
+
+let timer;
+let countdown = 3;
+
+function hideAll(){
+    document.querySelectorAll('.screen')
+        .forEach(s=>s.classList.remove('active'));
+}
+
+function go(n){
+    hideAll();
+    clearMsgs();
+
+    if(n===3){
+        document.getElementById('image-screen').classList.add('active');
+        startTimer();
+    }else{
+        document.getElementById('screen'+n).classList.add('active');
+    }
+}
+
+function noClick(n){
+    const msg=document.getElementById('msg'+n);
+    msg.innerText='kyu nhi kr rhi 🥺';
+
+    disableBtns(n,true);
+
+    setTimeout(()=>{
+        msg.innerText='';
+        disableBtns(n,false);
+        hideAll();
+        document.getElementById('screen'+n).classList.add('active');
+    },2000);
+}
+
+function disableBtns(n,state){
+    document.querySelectorAll('#screen'+n+' button')
+        .forEach(b=>b.disabled=state);
+}
+
+function clearMsgs(){
+    document.querySelectorAll('.no-msg')
+        .forEach(m=>m.innerText='');
+}
+
+function startTimer(){
+    timer=setInterval(()=>{
+        countdown--;
+        document.getElementById('timer').innerText=countdown;
+
+        if(countdown<=0){
+            clearInterval(timer);
+            document.body.innerHTML=`
+                <div class="screen active" style="background:#000;color:#ff4d4d">
+                    <h1>🔒 IMAGE DESTROYED</h1>
+                    <p style="opacity:0.7">Session terminated permanently</p>
+                </div>
+            `;
+        }
+    },1000);
+}
+
+/* Security */
+document.addEventListener('contextmenu',e=>e.preventDefault());
+document.addEventListener('keydown',e=>{
+    if(e.key==='PrintScreen'||e.key==='F12')e.preventDefault();
+});
+</script>
+
+</body>
+</html>
